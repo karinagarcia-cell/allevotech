@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Diagnóstico de Carreira — Allevo Tech</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#0a0a0a;--surface:#111410;--surface2:#161a13;
+  --border:#1e2b1f;--border2:#2a3a2b;
+  --green:#4af05a;--gdim:#1a3320;
+  --blue:#3b9eff;--bdim:#0f1e38;
+  --muted:#5a6b5b;--text:#c8d4c8;--white:#eef2ee;
+}
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;line-height:1.6;}
+#app{max-width:640px;margin:0 auto;padding:0 20px 80px;}
+
+.logo-bar{padding:28px 0 24px;display:flex;align-items:center;gap:10px;}
+.logo-box{width:34px;height:34px;border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--surface);}
+.logo-box svg{width:18px;height:18px;}
+.logo-txt{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:var(--white);}
+.logo-txt b{color:var(--green);font-weight:700;}
+
+.prog-lbl{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:7px;}
+.prog-track{height:3px;background:var(--border);border-radius:2px;margin-bottom:36px;}
+.prog-fill{height:3px;background:var(--green);border-radius:2px;transition:width .4s ease;}
+
+.step-tag{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin-bottom:12px;}
+.q-title{font-family:'Syne',sans-serif;font-size:clamp(22px,5vw,30px);font-weight:800;color:var(--white);line-height:1.15;margin-bottom:8px;}
+.q-sub{font-size:14px;color:var(--muted);margin-bottom:28px;}
+.options{display:flex;flex-direction:column;gap:10px;margin-bottom:28px;}
+
+.opt{
+  display:flex;align-items:center;gap:14px;
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:14px;padding:16px 18px;
+  cursor:pointer;text-align:left;width:100%;
+  -webkit-appearance:none;appearance:none;
+  touch-action:manipulation;user-select:none;-webkit-user-select:none;
+  min-height:64px;
+}
+.opt:active{background:var(--surface2);}
+.opt.sel-g{border-color:var(--green);background:var(--gdim);}
+.opt.sel-b{border-color:var(--blue);background:var(--bdim);}
+.opt-icon{font-size:22px;flex-shrink:0;width:36px;text-align:center;line-height:1;}
+.opt-body{flex:1;min-width:0;}
+.opt-title{font-size:15px;font-weight:500;color:var(--white);display:block;line-height:1.3;}
+.opt-desc{font-size:12px;color:var(--muted);margin-top:2px;display:block;}
+.opt-radio{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.opt.sel-g .opt-radio{background:var(--green);border-color:var(--green);}
+.opt.sel-b .opt-radio{background:var(--blue);border-color:var(--blue);}
+.opt-dot{width:7px;height:7px;border-radius:50%;background:var(--bg);display:none;}
+.opt.sel-g .opt-dot,.opt.sel-b .opt-dot{display:block;}
+
+.btn-next{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--green);color:var(--bg);
+  border:none;border-radius:12px;padding:15px 28px;
+  font-family:'Syne',sans-serif;font-size:15px;font-weight:700;
+  cursor:pointer;touch-action:manipulation;-webkit-appearance:none;
+}
+.btn-next:disabled{opacity:.3;}
+
+.res-tag{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;}
+.res-title{font-family:'Syne',sans-serif;font-size:clamp(24px,5vw,34px);font-weight:800;color:var(--white);line-height:1.1;margin-bottom:10px;}
+.res-sub{font-size:14px;color:var(--muted);margin-bottom:32px;border-bottom:1px solid var(--border);padding-bottom:28px;}
+
+.meta-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:36px;}
+.meta-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;}
+.meta-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+.meta-val{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;line-height:1;}
+.meta-sub{font-size:11px;color:var(--muted);margin-top:3px;}
+
+.tl-heading{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--white);margin-bottom:20px;}
+.tl-row{display:flex;gap:18px;}
+.tl-left{display:flex;flex-direction:column;align-items:center;width:32px;flex-shrink:0;}
+.tl-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--border2);background:var(--surface);flex-shrink:0;margin-top:3px;}
+.tl-dot.g{background:var(--green);border-color:var(--green);}
+.tl-dot.b{background:var(--blue);border-color:var(--blue);}
+.tl-line{flex:1;width:1px;background:var(--border);min-height:16px;}
+.tl-right{padding-bottom:24px;flex:1;min-width:0;}
+.tl-month{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;}
+.tl-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+.tl-card.g{border-left:3px solid var(--green);}
+.tl-card.b{border-left:3px solid var(--blue);}
+.tl-card-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--white);margin-bottom:5px;}
+.tl-card-desc{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:8px;}
+.chips{display:flex;flex-wrap:wrap;gap:5px;}
+.chip{font-size:11px;padding:3px 8px;border-radius:4px;background:rgba(255,255,255,.04);color:var(--muted);border:1px solid rgba(255,255,255,.06);}
+.chip.g{background:rgba(74,240,90,.08);color:#4af05a;border-color:rgba(74,240,90,.15);}
+.chip.b{background:rgba(59,158,255,.08);color:#3b9eff;border-color:rgba(59,158,255,.15);}
+
+.sal-block{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-top:28px;}
+.sal-block h3{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--white);margin-bottom:16px;}
+.sal-row{margin-bottom:12px;}
+.sal-labels{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:4px;}
+.sal-track{height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.sal-fill{height:5px;border-radius:3px;}
+.sal-note{font-size:11px;color:var(--muted);margin-top:10px;}
+
+.cta-block{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;margin-top:28px;}
+.cta-block h3{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--white);margin-bottom:8px;}
+.cta-block p{font-size:13px;color:var(--muted);margin-bottom:20px;}
+.btn-cta{display:inline-block;background:var(--green);color:var(--bg);border:none;border-radius:10px;padding:13px 22px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;text-decoration:none;cursor:pointer;margin:0 8px 8px 0;touch-action:manipulation;}
+.btn-ghost{display:inline-block;background:transparent;color:var(--text);border:1px solid var(--border2);border-radius:10px;padding:12px 18px;font-size:13px;cursor:pointer;margin-bottom:8px;touch-action:manipulation;-webkit-appearance:none;font-family:'DM Sans',sans-serif;}
+.restart{display:inline-block;margin-top:24px;font-size:12px;color:var(--muted);text-decoration:underline;cursor:pointer;touch-action:manipulation;}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="logo-bar">
+    <div class="logo-box">
+      <svg viewBox="0 0 18 18" fill="none"><rect x="1" y="1" width="16" height="16" rx="4" stroke="#4af05a" stroke-width="1.2"/><path d="M4 9h3l1-2.5 1.5 5L11 9h3" stroke="#4af05a" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <span class="logo-txt">Allevo<b>Tech</b></span>
+  </div>
+  <div class="prog-lbl"><span id="prog-label">Diagnóstico de carreira</span><span id="prog-num">0 de 4</span></div>
+  <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  <div id="main"></div>
+</div>
+<script>
+var answers = {};
+var currentQ = 1;
+
+var questions = [
+  { id:1, tag:'Pergunta 1 de 4', title:'Qual é o seu principal objetivo agora?', sub:'Isso vai definir o foco do seu plano de 6 meses.',
+    opts:[
+      {val:'emprego',   icon:'🎯', title:'Conseguir meu primeiro emprego em tech',          desc:'Quero entrar na área e ter minha primeira oportunidade'},
+      {val:'transicao', icon:'🔄', title:'Fazer transição de carreira para tech',            desc:'Trabalho em outra área e quero migrar completamente'},
+      {val:'salario',   icon:'📈', title:'Aumentar meu salário e crescer na carreira',      desc:'Já tenho algum contato com tech e quero me especializar'},
+      {val:'freelance', icon:'🚀', title:'Trabalhar como freelancer ou criar meu produto',  desc:'Quero independência e minha própria renda em tech'}
+    ]
+  },
+  { id:2, tag:'Pergunta 2 de 4', title:'Qual é o seu nível atual?', sub:'Seja honesto — o plano é feito para o seu ponto de partida.',
+    opts:[
+      {val:'zero',      icon:'🌱', title:'Zero — nunca programei na vida',           desc:'Não tenho nenhuma experiência com código ou dados'},
+      {val:'iniciante', icon:'📖', title:'Iniciante — fiz cursos introdutórios',     desc:'Aprendi o básico de HTML ou Python, mas sem prática real'},
+      {val:'base',      icon:'🛠', title:'Tenho base — já criei alguns projetos',    desc:'Já escrevi código real, mas não me sinto pronto para o mercado'}
+    ]
+  },
+  { id:3, tag:'Pergunta 3 de 4', title:'O que mais te atrai em tech?', sub:'Isso vai nos ajudar a recomendar a trilha certa para você.',
+    opts:[
+      {val:'tech', icon:'🖥', title:'Criar produtos digitais — apps, sites, sistemas',      desc:'Quero construir coisas que as pessoas usam'},
+      {val:'data', icon:'📊', title:'Analisar dados e extrair inteligência de negócio',     desc:'Quero trabalhar com dados, estatística e IA aplicada'},
+      {val:'both', icon:'🤔', title:'Não tenho certeza ainda',                              desc:'Quero entender melhor as duas opções antes de escolher'}
+    ]
+  },
+  { id:4, tag:'Pergunta 4 de 4', title:'Quantas horas por semana você pode dedicar?', sub:'Seu plano será ajustado à sua disponibilidade real.',
+    opts:[
+      {val:'5',  icon:'⏱', title:'Até 5 horas por semana',      desc:'Tenho pouco tempo, estudo nos finais de semana'},
+      {val:'10', icon:'⏰', title:'De 5 a 10 horas por semana',  desc:'Consigo estudar algumas horas por dia durante a semana'},
+      {val:'20', icon:'🔥', title:'Mais de 10 horas por semana', desc:'Tenho bastante tempo e quero avançar rápido'}
+    ]
+  }
+];
+
+function renderQuestion(q) {
+  var isLast = q.id === 4;
+  var html = '<div class="step-tag">'+q.tag+'</div>'
+    +'<h1 class="q-title">'+q.title+'</h1>'
+    +'<p class="q-sub">'+q.sub+'</p>'
+    +'<div class="options">';
+  q.opts.forEach(function(o) {
+    html += '<button class="opt" data-val="'+o.val+'" type="button">'
+      +'<span class="opt-icon">'+o.icon+'</span>'
+      +'<span class="opt-body"><span class="opt-title">'+o.title+'</span><span class="opt-desc">'+o.desc+'</span></span>'
+      +'<span class="opt-radio"><span class="opt-dot"></span></span>'
+      +'</button>';
+  });
+  html += '</div><button class="btn-next" id="btn-next" type="button" disabled>'+(isLast ? 'Ver meu plano →' : 'Continuar →')+'</button>';
+  document.getElementById('main').innerHTML = html;
+
+  var saved = answers['q'+q.id];
+  if (saved) {
+    var all = document.querySelectorAll('.opt');
+    for (var i=0; i<all.length; i++) {
+      if (all[i].getAttribute('data-val') === saved) {
+        all[i].classList.add(getSelClass());
+        document.getElementById('btn-next').disabled = false;
+      }
+    }
+  }
+
+  var opts = document.querySelectorAll('.opt');
+  for (var j=0; j<opts.length; j++) {
+    opts[j].addEventListener('click', makeOptHandler(q.id, opts[j]));
+  }
+  document.getElementById('btn-next').addEventListener('click', onNext);
+}
+
+function makeOptHandler(qId, btn) {
+  return function() {
+    var all = document.querySelectorAll('.opt');
+    for (var i=0; i<all.length; i++) all[i].classList.remove('sel-g','sel-b');
+    btn.classList.add(getSelClass());
+    answers['q'+qId] = btn.getAttribute('data-val');
+    document.getElementById('btn-next').disabled = false;
+  };
+}
+
+function getSelClass() {
+  return answers['q3'] === 'data' ? 'sel-b' : 'sel-g';
+}
+
+function onNext() {
+  if (!answers['q'+currentQ]) return;
+  var pct = (currentQ/4)*100;
+  document.getElementById('prog-fill').style.width = pct+'%';
+  document.getElementById('prog-num').textContent = currentQ+' de 4';
+  if (currentQ < 4) {
+    currentQ++;
+    renderQuestion(questions[currentQ-1]);
+  } else {
+    document.getElementById('prog-fill').style.width = '100%';
+    document.getElementById('prog-num').textContent = '4 de 4';
+    document.getElementById('prog-label').textContent = 'Plano gerado';
+    renderResult();
+  }
+}
+
+function renderResult() {
+  var objetivo = answers.q1;
+  var nivel    = answers.q2;
+  var trilha   = answers.q3;
+  var horas    = parseInt(answers.q4);
+  var isTech   = trilha !== 'data';
+  var acc      = isTech ? '#4af05a' : '#3b9eff';
+  var cls      = isTech ? 'g' : 'b';
+  var nome     = isTech ? 'Engenheiro de Software' : 'Cientista de Dados';
+  var total    = horas * 26;
+  var ritmo    = horas <= 5 ? 'moderado' : horas <= 10 ? 'constante' : 'intensivo';
+  var certs    = isTech ? 7 : 9;
+  var objMap   = {emprego:'primeiro emprego em tech',transicao:'transição de carreira',salario:'crescimento salarial',freelance:'trabalho autônomo'};
+  var nivMap   = {zero:'do zero',iniciante:'nível iniciante',base:'com base técnica'};
+
+  var html = '<div class="res-tag" style="color:'+acc+'">Trilha recomendada · '+nome+'</div>'
+    +'<h2 class="res-title">Seu plano para <span style="color:'+acc+'">'+nome+'</span></h2>'
+    +'<p class="res-sub">Com foco em '+objMap[objetivo]+', partindo '+nivMap[nivel]+' e dedicando '+horas+'h/semana — você tem tudo para chegar lá em 6 meses.</p>'
+    +'<div class="meta-grid">'
+    +'<div class="meta-card"><div class="meta-lbl">Horas/semana</div><div class="meta-val" style="color:'+acc+'">'+horas+'h</div><div class="meta-sub">ritmo '+ritmo+'</div></div>'
+    +'<div class="meta-card"><div class="meta-lbl">Total estimado</div><div class="meta-val" style="color:'+acc+'">'+total+'h</div><div class="meta-sub">em 6 meses</div></div>'
+    +'<div class="meta-card"><div class="meta-lbl">Certificados</div><div class="meta-val" style="color:'+acc+'">'+certs+'</div><div class="meta-sub">ao concluir</div></div>'
+    +'</div>'
+    +'<div class="tl-heading">Seu plano mês a mês</div>';
+
+  var plan = buildPlan(isTech, nivel, horas, objetivo, cls);
+  plan.forEach(function(m, i) {
+    var isLast = i === plan.length-1;
+    html += '<div class="tl-row">'
+      +'<div class="tl-left"><div class="tl-dot '+cls+'"></div>'+(isLast?'':'<div class="tl-line"></div>')+'</div>'
+      +'<div class="tl-right"><div class="tl-month">Mês '+(i+1)+'</div>'
+      +'<div class="tl-card '+cls+'"><div class="tl-card-title">'+m.title+'</div>'
+      +'<div class="tl-card-desc">'+m.desc+'</div>'
+      +'<div class="chips">'+m.chips.map(function(c){return '<span class="chip '+cls+'">'+c+'</span>';}).join('')+'</div>'
+      +'</div></div></div>';
+  });
+
+  var salData = isTech
+    ? [{r:'Dev Júnior',v:'R$ 3.000 – 5.000',p:28},{r:'Dev Pleno',v:'R$ 5.000 – 9.000',p:50},{r:'Engenheiro de Software',v:'R$ 8.000 – 14.000',p:78}]
+    : [{r:'Analista Jr',v:'R$ 3.000 – 5.000',p:30},{r:'Analista Pleno',v:'R$ 5.000 – 8.000',p:50},{r:'Cientista de Dados',v:'R$ 7.000 – 12.000',p:70}];
+
+  html += '<div class="sal-block"><h3>Progressão salarial esperada</h3>';
+  salData.forEach(function(s){
+    html += '<div class="sal-row"><div class="sal-labels"><span>'+s.r+'</span><span>'+s.v+'</span></div>'
+      +'<div class="sal-track"><div class="sal-fill" style="width:'+s.p+'%;background:'+acc+'"></div></div></div>';
+  });
+  html += '<div class="sal-note">Fonte: Glassdoor · Brasil · 2024</div></div>';
+
+  var waMsg = encodeURIComponent('Olá! Fiz o diagnóstico da Allevo e quero saber mais sobre a trilha de '+nome+'.');
+  html += '<div class="cta-block"><h3>Pronto para começar?</h3>'
+    +'<p>Seu diagnóstico está feito. Fale com nosso time e garanta sua vaga na trilha de '+nome+'.</p>'
+    +'<a class="btn-cta" href="https://wa.me/5512936180226?text='+waMsg+'" target="_blank">Falar com consultor</a>'
+    +'<button class="btn-ghost" id="btn-print">Salvar como PDF</button>'
+    +'</div>'
+    +'<div><span class="restart" id="btn-restart">← Refazer o diagnóstico</span></div>';
+
+  document.getElementById('main').innerHTML = html;
+  document.getElementById('btn-print').addEventListener('click', function(){ window.print(); });
+  document.getElementById('btn-restart').addEventListener('click', function(){
+    answers = {}; currentQ = 1;
+    document.getElementById('prog-fill').style.width = '0%';
+    document.getElementById('prog-num').textContent = '0 de 4';
+    document.getElementById('prog-label').textContent = 'Diagnóstico de carreira';
+    renderQuestion(questions[0]);
+  });
+}
+
+function buildPlan(isTech, nivel, horas, objetivo) {
+  var fast = horas >= 10, hasBase = nivel === 'base', jobFocus = objetivo === 'emprego' || objetivo === 'transicao';
+  if (isTech) return [
+    {title:hasBase?'Nivelamento e JS moderno':'Fundamentos: HTML, CSS e lógica',
+     desc:hasBase?'Revisão de conceitos, boas práticas e JavaScript ES6+ na prática.':'Como a web funciona, HTML, CSS responsivo e introdução à lógica de programação.',
+     chips:hasBase?['JS ES6+','Funções','Arrays','DOM']:['HTML','CSS','Flexbox','Lógica']},
+    {title:'React e front-end moderno',
+     desc:'Interfaces reativas com React, hooks, consumo de APIs e gestão de estado. Primeiro projeto no portfólio.',
+     chips:['React','Hooks','APIs','TypeScript']},
+    {title:'Back-end com Node.js',
+     desc:'APIs REST com Node.js, rotas, autenticação e banco de dados SQL e MongoDB.',
+     chips:['Node.js','REST API','SQL','MongoDB']},
+    {title:fast?'DevOps, testes e projeto real':'Banco de dados e DevOps',
+     desc:fast?'Docker, CI/CD com AWS, testes automatizados e projeto com empresa parceira.':'Modelagem de dados, Docker e primeiros passos em CI/CD.',
+     chips:fast?['Docker','AWS','CI/CD','Jest']:['Docker','Modelagem DB','CI/CD']},
+    {title:'NestJS, Next.js e arquitetura',
+     desc:'Frameworks de produção: NestJS no backend e Next.js no frontend em arquitetura escalável.',
+     chips:['NestJS','Next.js','SSR','Arquitetura']},
+    {title:jobFocus?'Portfólio, currículo e entrevistas':'Especialização e projetos próprios',
+     desc:jobFocus?'GitHub organizado, currículo técnico, LinkedIn e simulações de entrevistas.':'Open source, produto próprio e posicionamento como desenvolvedor freelancer.',
+     chips:jobFocus?['GitHub','LinkedIn','Portfolio','Entrevistas']:['Open Source','Produto','Freelance','Networking']}
+  ];
+  return [
+    {title:hasBase?'SQL avançado e Excel profissional':'Fundamentos: dados, Excel e SQL',
+     desc:hasBase?'Consultas complexas, JOINs avançados e dashboards no Metabase.':'Tipos de dados, Excel para análise e primeiros passos em SQL.',
+     chips:hasBase?['SQL avançado','Metabase','Dashboard','Excel']:['Excel','SQL','Métricas','Visualização']},
+    {title:'Python para análise de dados',
+     desc:'Pandas para manipulação, NumPy para cálculos e Matplotlib para visualização. Projeto real.',
+     chips:['Python','Pandas','NumPy','Matplotlib']},
+    {title:'Estatística e preparação para ML',
+     desc:'Estatística descritiva e inferencial. Distribuições, correlações e testes de hipótese.',
+     chips:['Estatística','Scipy','Testes','IA intro']},
+    {title:'Data Cleaning e Machine Learning',
+     desc:'Limpeza de dados e modelos supervisionados de classificação e regressão com Scikit-learn.',
+     chips:['Scikit-learn','Wrangling','Classificação','Regressão']},
+    {title:fast?'Clusterização e Big Data na nuvem':'Clusterização e modelos avançados',
+     desc:fast?'Algoritmos não supervisionados, PySpark e deploy de modelos na AWS.':'K-Means, DBSCAN, segmentação e introdução ao Big Data.',
+     chips:fast?['PySpark','K-Means','AWS Lambda','Big Data']:['K-Means','Segmentação','TensorFlow','Nuvem']},
+    {title:jobFocus?'Portfólio, currículo e entrevistas':'Especialização e projetos de dados',
+     desc:jobFocus?'Cases no GitHub, LinkedIn e simulações de entrevistas técnicas.':'Kaggle, dashboards públicos e posicionamento como especialista.',
+     chips:jobFocus?['GitHub','Portfolio','LinkedIn','Entrevistas']:['Kaggle','Dashboard','Consultoria','Networking']}
+  ];
+}
+
+renderQuestion(questions[0]);
+</script>
+</body>
+</html>
